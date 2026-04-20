@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CertVerify — Digital Certificate Verification</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="overlay" class="overlay" onclick="closeGuide()"></div>
+<div id="guide" class="guide-sidebar">
+  <button class="close-btn" onclick="closeGuide()">[ ✕ CLOSE ]</button>
+  <h2>// USER GUIDE</h2>
+  <div class="g-section">
+    <h3>SYSTEM OVERVIEW</h3>
+    <p>CertVerify is a real-time digital certificate authentication system. Enter a certificate ID to instantly check if it is registered in the secure database.</p>
+  </div>
+  <div class="g-section">
+    <h3>HOW TO VERIFY</h3>
+    <ol>
+      <li>Select the <strong>SINGLE VERIFICATION</strong> tab.</li>
+      <li>Enter the Certificate ID (e.g. <code>CV-1001</code>).</li>
+      <li>Hit <strong>VERIFY NOW</strong>.</li>
+      <li>Result renders instantly below.</li>
+    </ol>
+    <p style="margin-top:8px">For multiple IDs, use the <strong>BULK VERIFICATION</strong> tab. You can also click <strong>VIEW CERTIFICATE</strong> on any valid result to see the printable certificate.</p>
+  </div>
+  <div class="g-section">
+    <h3>VALID CERTIFICATE</h3>
+    <p>A <span class="tag tv">VALID</span> response confirms the ID exists in the secure registry. Full certificate details are displayed.</p>
+  </div>
+  <div class="g-section">
+    <h3>INVALID CERTIFICATE</h3>
+    <p>An <span class="tag ti">INVALID</span> response means the ID was not found. The certificate may be fake, expired, or the ID was entered incorrectly.</p>
+  </div>
+  <div class="g-section">
+    <h3>SAMPLE IDs TO TRY</h3>
+    <ul>
+      <li><code>CV-1001</code> — Alice Johnson, CS</li>
+      <li><code>CV-1002</code> — Marcus Williams, Data Science</li>
+      <li><code>CV-1003</code> — Priya Sharma, Cybersecurity</li>
+      <li><code>CV-1004</code> — James Chen, AI &amp; ML</li>
+      <li><code>CV-1005</code> — Lena Petrova, Cloud Computing</li>
+      <li><code>CV-1006</code> — Omar Hassan, Blockchain</li>
+      <li><code>CV-1007</code> — Sofia Martinez, Web Dev</li>
+      <li><code>CV-1008</code> — Ryan Park, DevOps</li>
+      <li><code>CV-9999</code> — invalid (not found)</li>
+    </ul>
+  </div>
+</div>
+
+<button class="float-guide" onclick="openGuide()">&#9607; USER GUIDE</button>
+
+<header class="site-header">
+  <div class="header-icon">🛡</div>
+  <h1>CERTVERIFY SYSTEM</h1>
+  <p class="subtitle">Digital Certificate Authentication Protocol v2.4</p>
+</header>
+
+<div class="status-bar">
+  <span><span class="stat-dot stat-green"></span>DATABASE: ONLINE</span>
+  <span><span class="stat-dot stat-cyan"></span>ENCRYPTION: AES-256</span>
+  <span><span class="stat-dot stat-amber"></span>RECORDS: 8 LOADED</span>
+</div>
+
+<main class="main-container">
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('single',this)">[ 🔍 SINGLE VERIFICATION ]</button>
+    <button class="tab-btn"        onclick="switchTab('bulk',this)"  >[ 📂 BULK VERIFICATION ]</button>
+  </div>
+
+  <!-- Single Tab -->
+  <div id="tab-single" class="tab-panel active">
+    <div class="card">
+      <div class="card-label">// MODULE_01 — CERTIFICATE LOOKUP</div>
+      <h2>SINGLE VERIFICATION</h2>
+      <p class="card-desc">Enter a Certificate ID to authenticate against the secure registry. Optional fields can help narrow cross-checks.</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Certificate ID <span style="color:var(--red)">*</span></label>
+          <input type="text" id="cert-id" placeholder="CV-XXXX" onkeydown="if(event.key==='Enter')verifySingle()" />
+        </div>
+        <div class="form-group">
+          <label>Student Name <span class="opt">(optional cross-check)</span></label>
+          <input type="text" id="s-name" placeholder="e.g. Alice Johnson" />
+        </div>
+        <div class="form-group">
+          <label>Course <span class="opt">(optional)</span></label>
+          <input type="text" id="s-course" placeholder="e.g. Bachelor of CS" />
+        </div>
+        <div class="form-group">
+          <label>Institute <span class="opt">(optional)</span></label>
+          <input type="text" id="s-inst" placeholder="e.g. TechVista University" />
+        </div>
+        <div class="form-group">
+          <label>Issue Date <span class="opt">(optional)</span></label>
+          <input type="date" id="s-date" />
+        </div>
+      </div>
+      <button class="verify-btn" id="single-btn" onclick="verifySingle()">
+        <span>&#9654; VERIFY NOW</span>
+      </button>
+    </div>
+    <div id="single-result" class="result-card hidden"></div>
+  </div>
+
+  <!-- Bulk Tab -->
+  <div id="tab-bulk" class="tab-panel">
+    <div class="card">
+      <div class="card-label">// MODULE_02 — BATCH AUTHENTICATION</div>
+      <h2>BULK VERIFICATION</h2>
+      <p class="card-desc">Paste Certificate IDs one per line, or upload a .txt file for batch processing.</p>
+      <div class="form-group">
+        <label>Certificate IDs — One Per Line</label>
+        <textarea id="bulk-ids" rows="7" placeholder="CV-1001&#10;CV-1002&#10;CV-1003&#10;CV-9999"></textarea>
+      </div>
+      <div class="bulk-actions">
+        <label class="upload-btn">
+          &#8679; UPLOAD .TXT FILE
+          <input type="file" accept=".txt" onchange="loadFile(event)" hidden />
+        </label>
+        <button class="verify-btn" id="bulk-btn" onclick="verifyBulk()">
+          <span>&#9654; VERIFY ALL</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="bulk-result" class="hidden">
+      <div class="card">
+        <div class="card-label">// SCAN RESULTS</div>
+        <h2 style="margin-bottom:16px">VERIFICATION REPORT</h2>
+        <div id="bulk-summary" class="bulk-summary"></div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr><th>#</th><th>CERT ID</th><th>STATUS</th><th>STUDENT NAME</th><th>COURSE</th><th>INSTITUTE</th><th>ISSUE DATE</th></tr>
+            </thead>
+            <tbody id="bulk-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- AI Chat -->
+<div id="ai-popup" class="ai-popup hidden">
+  <div class="ai-header">
+    <span>&#9670; AI ASSISTANT v1.0</span>
+    <button onclick="toggleAI()">✕</button>
+  </div>
+  <div id="ai-msgs" class="ai-messages">
+    <div class="ai-msg bot">&#9654; System online. Ask me anything about certificate verification. Try: <em>"show sample IDs"</em>, <em>"how to verify"</em>, or <em>"what is bulk mode"</em>.</div>
+  </div>
+  <div class="ai-input-row">
+    <input type="text" id="ai-in" placeholder="Enter query..." onkeydown="if(event.key==='Enter')sendAI()" />
+    <button onclick="sendAI()">SEND</button>
+  </div>
+</div>
+<button class="float-ai" onclick="toggleAI()">&#9670; ASK AI</button>
+
+<script>
+/* ── Certificate Database ─────────────────────────────────────────────── */
+const DB = {
+  'CV-1001': { certificate_id:'CV-1001', student_name:'Alice Johnson',   course:'Bachelor of Computer Science',     institute:'TechVista University',  issue_date:'2024-05-15', grade:'First Class Distinction' },
+  'CV-1002': { certificate_id:'CV-1002', student_name:'Marcus Williams',  course:'Master of Data Science',          institute:'TechVista University',  issue_date:'2024-06-20', grade:'Distinction' },
+  'CV-1003': { certificate_id:'CV-1003', student_name:'Priya Sharma',     course:'Advanced Cybersecurity Program',  institute:'TechVista University',  issue_date:'2024-07-10', grade:'First Class Distinction' },
+  'CV-1004': { certificate_id:'CV-1004', student_name:'James Chen',       course:'AI & Machine Learning Bootcamp',  institute:'TechVista University',  issue_date:'2024-08-01', grade:'Merit' },
+  'CV-1005': { certificate_id:'CV-1005', student_name:'Lena Petrova',     course:'Cloud Computing & Architecture',  institute:'TechVista University',  issue_date:'2024-09-12', grade:'Distinction' },
+  'CV-1006': { certificate_id:'CV-1006', student_name:'Omar Hassan',      course:'Blockchain Development',          institute:'TechVista University',  issue_date:'2024-10-05', grade:'Merit' },
+  'CV-1007': { certificate_id:'CV-1007', student_name:'Sofia Martinez',   course:'Full-Stack Web Development',      institute:'TechVista University',  issue_date:'2024-11-20', grade:'First Class Distinction' },
+  'CV-1008': { certificate_id:'CV-1008', student_name:'Ryan Park',        course:'DevOps Engineering',              institute:'TechVista University',  issue_date:'2025-01-08', grade:'Distinction' },
+};
+
+/* ── Tab Switch ──────────────────────────────────────────────────────── */
+function switchTab(name, btn){
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+/* ── Guide ───────────────────────────────────────────────────────────── */
+function openGuide()  { document.getElementById('guide').classList.add('open'); document.getElementById('overlay').classList.add('active'); document.body.style.overflow='hidden'; }
+function closeGuide() { document.getElementById('guide').classList.remove('open'); document.getElementById('overlay').classList.remove('active'); document.body.style.overflow=''; }
+function toggleAI()   { document.getElementById('ai-popup').classList.toggle('hidden'); }
+
+/* ── AI Chat ─────────────────────────────────────────────────────────── */
+function sendAI(){
+  const inp = document.getElementById('ai-in'), txt = inp.value.trim();
+  if(!txt) return;
+  addMsg(txt, 'user'); inp.value = '';
+  setTimeout(() => addMsg(aiReply(txt), 'bot'), 420);
+}
+function addMsg(text, role){
+  const box = document.getElementById('ai-msgs');
+  const d = document.createElement('div'); d.className = 'ai-msg ' + role; d.textContent = text;
+  box.appendChild(d); box.scrollTop = box.scrollHeight;
+}
+function aiReply(msg){
+  const m = msg.toLowerCase();
+  if(m.includes('hello') || m.includes('hi')) return '> Connection established. I can assist with verification queries, valid/invalid status explanations, and bulk processing. State your query.';
+  if(m.includes('how') || m.includes('verify') || m.includes('check')) return '> VERIFY PROTOCOL:\n1. Single tab → enter Certificate ID (format: CV-XXXX)\n2. Press VERIFY NOW\n3. System returns result instantly. Click VIEW CERTIFICATE on valid results.';
+  if(m.includes('valid') && !m.includes('invalid')) return '> VALID STATUS: Certificate ID confirmed in secure registry. Full record returned — student name, course, institute, grade, issue date.';
+  if(m.includes('invalid') || m.includes('fake') || m.includes('not found')) return '> INVALID STATUS: Certificate ID not found in registry. Possible causes: counterfeit document, expired record, or incorrect ID entered.';
+  if(m.includes('bulk') || m.includes('multiple') || m.includes('batch')) return '> BULK MODE: Switch to BULK VERIFICATION tab. Paste IDs (one per line) or upload .txt file. System processes all simultaneously and generates a full table report.';
+  if(m.includes('sample') || m.includes('example') || m.includes('test') || m.includes('id')) return '> SAMPLE IDs:\n[VALID]   CV-1001 → Alice Johnson\n[VALID]   CV-1002 → Marcus Williams\n[VALID]   CV-1003 → Priya Sharma\n[VALID]   CV-1004 → James Chen\n[VALID]   CV-1005 → Lena Petrova\n[VALID]   CV-1006 → Omar Hassan\n[VALID]   CV-1007 → Sofia Martinez\n[VALID]   CV-1008 → Ryan Park\n[INVALID] CV-9999 → not in registry';
+  if(m.includes('certificate') || m.includes('view')) return '> After verifying a valid ID, a VIEW CERTIFICATE button appears. Click it to open the full printable certificate in a new tab.';
+  if(m.includes('grade') || m.includes('result')) return '> Certificates carry a grade: First Class Distinction, Distinction, or Merit. This is displayed on both the verification result and the printable certificate.';
+  return '> Query not recognized. Try: "how to verify", "show sample IDs", "what is bulk mode", or "what is valid".';
+}
+
+/* ── Single Verify ───────────────────────────────────────────────────── */
+function verifySingle(){
+  const certId  = document.getElementById('cert-id').value.trim().toUpperCase();
+  const nameIn  = document.getElementById('s-name').value.trim().toLowerCase();
+  const res     = document.getElementById('single-result');
+
+  if(!certId){ showErr(res, '[ ERROR ] Certificate ID is required. Format: CV-XXXX'); return; }
+
+  const btn = document.getElementById('single-btn');
+  btn.querySelector('span').textContent = '⟳ SCANNING...';
+  btn.style.opacity = '.6'; btn.style.pointerEvents = 'none';
+
+  setTimeout(() => {
+    const cert = DB[certId];
+    if(cert){
+      const nameMatch = !nameIn || cert.student_name.toLowerCase().includes(nameIn);
+      if(!nameMatch){
+        res.className = 'result-card invalid';
+        res.innerHTML = `<div class="result-title">&#9888; NAME MISMATCH</div>
+          <p style="color:var(--text)">Certificate <strong style="color:var(--cyan)">${certId}</strong> exists in the registry, but the name you entered does not match the registered holder. Please verify the name and try again.</p>`;
+      } else {
+        res.className = 'result-card valid';
+        res.innerHTML = `<div class="result-title">&#10003;&#10003; CERTIFICATE AUTHENTICATED</div>
+          <div class="result-grid">
+            <div class="result-field"><label>Certificate ID</label><p>${cert.certificate_id}</p></div>
+            <div class="result-field"><label>Student Name</label><p>${cert.student_name}</p></div>
+            <div class="result-field"><label>Course</label><p>${cert.course}</p></div>
+            <div class="result-field"><label>Institute</label><p>${cert.institute}</p></div>
+            <div class="result-field"><label>Grade Awarded</label><p>${cert.grade}</p></div>
+            <div class="result-field"><label>Issue Date</label><p>${cert.issue_date}</p></div>
+          </div>
+          <div style="margin-top:22px;display:flex;gap:14px;flex-wrap:wrap;">
+            <a class="view-cert-btn" href="certificate.html?id=${cert.certificate_id}" target="_blank">&#9670; VIEW CERTIFICATE</a>
+            <button class="copy-btn" onclick="copyId('${cert.certificate_id}')"><span id="copy-label-${cert.certificate_id}">&#9635; COPY ID</span></button>
+          </div>`;
+      }
+    } else {
+      res.className = 'result-card invalid';
+      res.innerHTML = `<div class="result-title">&#9888; AUTHENTICATION FAILED</div>
+        <p style="color:var(--text)">Certificate ID <strong style="color:var(--red)">${certId}</strong> was not found in the secure registry. This certificate may be counterfeit, expired, or the ID may have been entered incorrectly.</p>
+        <p style="margin-top:14px;font-size:.82rem;color:rgba(168,192,208,.6)">If you believe this is an error, contact the issuing institution directly.</p>`;
+    }
+    btn.querySelector('span').textContent = '&#9654; VERIFY NOW';
+    btn.style.opacity = ''; btn.style.pointerEvents = '';
+  }, 650);
+}
+
+function copyId(id){
+  navigator.clipboard.writeText(id).then(() => {
+    const lbl = document.getElementById('copy-label-' + id);
+    if(lbl){ lbl.textContent = '✓ COPIED'; setTimeout(()=>{ lbl.textContent='⊟ COPY ID'; },1600); }
+  });
+}
+
+/* ── Bulk Verify ─────────────────────────────────────────────────────── */
+function loadFile(e){
+  const f = e.target.files[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ev => { document.getElementById('bulk-ids').value = ev.target.result; };
+  reader.readAsText(f);
+}
+
+function verifyBulk(){
+  const ids = document.getElementById('bulk-ids').value.split('\n').map(s => s.trim().toUpperCase()).filter(Boolean);
+  const res = document.getElementById('bulk-result');
+  if(!ids.length){ alert('No IDs entered.'); return; }
+
+  const btn = document.getElementById('bulk-btn');
+  btn.querySelector('span').textContent = '⟳ PROCESSING...';
+  btn.style.opacity = '.6'; btn.style.pointerEvents = 'none';
+
+  setTimeout(() => {
+    const results = ids.map(id => {
+      const cert = DB[id];
+      if(cert) return { id, valid:true, ...cert };
+      return { id, valid:false, student_name:'—', course:'—', institute:'—', grade:'—', issue_date:'—' };
+    });
+    renderBulk(results);
+    res.classList.remove('hidden');
+    btn.querySelector('span').textContent = '&#9654; VERIFY ALL';
+    btn.style.opacity = ''; btn.style.pointerEvents = '';
+  }, 700);
+}
+
+function renderBulk(results){
+  const v = results.filter(r => r.valid).length, iv = results.length - v;
+  document.getElementById('bulk-summary').innerHTML = `
+    <span class="s-pill s-total">TOTAL: ${results.length}</span>
+    <span class="s-pill s-valid">&#10003; VALID: ${v}</span>
+    <span class="s-pill s-invalid">&#9888; INVALID: ${iv}</span>`;
+  document.getElementById('bulk-body').innerHTML = results.map((r, i) => `<tr>
+    <td style="color:var(--cyan);opacity:.6">${String(i+1).padStart(2,'0')}</td>
+    <td><code>${r.id}</code></td>
+    <td><span class="badge ${r.valid?'badge-v':'badge-i'}">${r.valid?'VALID':'INVALID'}</span></td>
+    <td>${r.student_name}</td>
+    <td>${r.course}</td>
+    <td>${r.institute}</td>
+    <td>${r.issue_date}</td>
+  </tr>`).join('');
+}
+
+function showErr(el, msg){
+  el.className = 'result-card invalid';
+  el.innerHTML = `<div class="result-title">&#9888; SYSTEM ERROR</div><p style="color:var(--text)">${msg}</p>`;
+}
+</script>
+</body>
+</html>

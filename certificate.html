@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Certificate — CertVerify</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body class="cert-page">
+
+<div class="cert-top-bar">
+  <a href="index.html" class="cert-back-btn">&#8592; BACK TO VERIFIER</a>
+  <button class="cert-print-btn" onclick="window.print()">&#9113; PRINT / SAVE PDF</button>
+</div>
+
+<div id="cert-wrap">
+  <!-- Filled dynamically by JS -->
+</div>
+
+<script>
+const DB = {
+  'CV-1001': { certificate_id:'CV-1001', student_name:'Alice Johnson',   course:'Bachelor of Computer Science',     grade:'First Class Distinction', issue_date:'2024-05-15', dean:'Prof. Eleanor Voss',    registrar:'Dr. Martin Schulz' },
+  'CV-1002': { certificate_id:'CV-1002', student_name:'Marcus Williams',  course:'Master of Data Science',          grade:'Distinction',             issue_date:'2024-06-20', dean:'Prof. Eleanor Voss',    registrar:'Dr. Martin Schulz' },
+  'CV-1003': { certificate_id:'CV-1003', student_name:'Priya Sharma',     course:'Advanced Cybersecurity Program',  grade:'First Class Distinction', issue_date:'2024-07-10', dean:'Prof. Eleanor Voss',    registrar:'Dr. Martin Schulz' },
+  'CV-1004': { certificate_id:'CV-1004', student_name:'James Chen',       course:'AI & Machine Learning Bootcamp', grade:'Merit',                   issue_date:'2024-08-01', dean:'Prof. Eleanor Voss',    registrar:'Dr. Martin Schulz' },
+  'CV-1005': { certificate_id:'CV-1005', student_name:'Lena Petrova',     course:'Cloud Computing & Architecture', grade:'Distinction',             issue_date:'2024-09-12', dean:'Prof. Eleanor Voss',    registrar:'Dr. Martin Schulz' },
+  'CV-1006': { certificate_id:'CV-1006', student_name:'Omar Hassan',      course:'Blockchain Development',         grade:'Merit',                   issue_date:'2024-10-05', dean:'Prof. Eleanor Voss',    registrar:'Dr. Martin Schulz' },
+  'CV-1007': { certificate_id:'CV-1007', student_name:'Sofia Martinez',   course:'Full-Stack Web Development',     grade:'First Class Distinction', issue_date:'2024-11-20', dean:'Prof. Eleanor Voss',    registrar:'Dr. Martin Schulz' },
+  'CV-1008': { certificate_id:'CV-1008', student_name:'Ryan Park',        course:'DevOps Engineering',             grade:'Distinction',             issue_date:'2025-01-08', dean:'Prof. Eleanor Voss',    registrar:'Dr. Martin Schulz' },
+};
+
+function formatDate(d){
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+}
+
+function renderCertificate(cert){
+  document.title = cert.student_name + ' — Certificate';
+  return `
+    <div class="certificate">
+      <div class="cert-border"></div>
+
+      <div class="cert-header-band">
+        <div class="cert-logo-row">
+          <span class="cert-logo-icon">🏛</span>
+          <div>
+            <div class="cert-institute-name">TECHVISTA UNIVERSITY</div>
+            <div class="cert-institute-sub">FACULTY OF TECHNOLOGY &amp; ADVANCED LEARNING</div>
+          </div>
+          <span class="cert-logo-icon">🏛</span>
+        </div>
+      </div>
+
+      <div class="gold-divider"></div>
+
+      <div class="cert-body">
+        <p class="cert-presents">This is to certify that</p>
+
+        <div class="cert-ornament">✦ ✦ ✦</div>
+
+        <p class="cert-awarded-to">We hereby certify that</p>
+
+        <div class="cert-name">${cert.student_name}</div>
+
+        <p class="cert-in-recognition">has successfully completed and fulfilled all requirements for the</p>
+
+        <div class="cert-title">
+          <span>CERTIFICATE OF ACHIEVEMENT</span>
+          ${cert.course}
+        </div>
+
+        <div class="cert-grade-band">&#9670; ${cert.grade.toUpperCase()} &#9670;</div>
+
+        <div class="cert-ornament">— ✦ —</div>
+
+        <div class="cert-meta-row">
+          <div class="cert-meta-item">
+            <div class="cert-meta-label">Certificate ID</div>
+            <div class="cert-meta-value">${cert.certificate_id}</div>
+          </div>
+          <div class="cert-meta-item">
+            <div class="cert-meta-label">Date of Issue</div>
+            <div class="cert-meta-value">${formatDate(cert.issue_date)}</div>
+          </div>
+          <div class="cert-meta-item">
+            <div class="cert-meta-label">Institution</div>
+            <div class="cert-meta-value">TechVista University</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-footer">
+        <div class="cert-sig-block">
+          <div class="cert-sig-line"></div>
+          <div class="cert-sig-name">${cert.dean}</div>
+          <div class="cert-sig-title">Dean of Faculty</div>
+        </div>
+
+        <div class="cert-seal">
+          <span class="cert-seal-icon">🛡</span>
+          <div class="cert-seal-text">TECHVISTA<br>UNIVERSITY<br>EST. 1982</div>
+        </div>
+
+        <div class="cert-sig-block">
+          <div class="cert-sig-line"></div>
+          <div class="cert-sig-name">${cert.registrar}</div>
+          <div class="cert-sig-title">University Registrar</div>
+        </div>
+      </div>
+
+      <div class="cert-verify-strip">
+        <div>
+          <div class="cert-verify-label">VERIFICATION ID</div>
+          <div class="cert-verify-id">${cert.certificate_id}</div>
+        </div>
+        <div style="text-align:center">
+          <div class="cert-verify-label">VERIFY AT</div>
+          <div class="cert-verify-id" style="font-size:.7rem;opacity:.7">certverify.system &nbsp;|&nbsp; AES-256 SECURED</div>
+        </div>
+        <div style="text-align:right">
+          <div class="cert-verify-label">STATUS</div>
+          <div class="cert-verify-valid">&#10003; AUTHENTIC</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderNotFound(id){
+  document.title = 'Certificate Not Found — CertVerify';
+  return `
+    <div class="certificate">
+      <div class="cert-border"></div>
+      <div class="cert-header-band">
+        <div class="cert-logo-row">
+          <span class="cert-logo-icon">🏛</span>
+          <div>
+            <div class="cert-institute-name">TECHVISTA UNIVERSITY</div>
+            <div class="cert-institute-sub">CERTIFICATE VERIFICATION SYSTEM</div>
+          </div>
+          <span class="cert-logo-icon">🏛</span>
+        </div>
+      </div>
+      <div class="gold-divider"></div>
+      <div class="cert-body cert-not-found">
+        <div style="font-size:3rem;margin-bottom:16px">⚠</div>
+        <h2>Certificate Not Found</h2>
+        <p>The certificate ID <strong>${id || 'unknown'}</strong> was not found in the registry.<br>Please return to the verifier and enter a valid Certificate ID.</p>
+        <a href="index.html" style="display:inline-block;margin-top:28px;padding:10px 28px;background:#1a1a3e;color:#00f5ff;font-family:'Share Tech Mono',monospace;font-size:.85rem;letter-spacing:.1em;text-decoration:none;border:1px solid #00f5ff;border-radius:3px;">&#8592; BACK TO VERIFIER</a>
+      </div>
+    </div>`;
+}
+
+(function init(){
+  const params = new URLSearchParams(window.location.search);
+  const id = (params.get('id') || '').trim().toUpperCase();
+  const wrap = document.getElementById('cert-wrap');
+  const cert = DB[id];
+  if(cert){
+    wrap.innerHTML = renderCertificate(cert);
+  } else {
+    wrap.innerHTML = renderNotFound(id);
+    document.querySelector('.cert-print-btn').style.display = 'none';
+  }
+})();
+</script>
+</body>
+</html>
